@@ -794,8 +794,12 @@ Kotlin's data classes are like standard classes, but they also come in with buil
   - `toString`: string representation of all the object's key/value pairs, rather than printing the object's address in memory
   - `copy`: not an override, but allows an object to be cloned, with the only changed attributes being the arguments passed in.
 
+Keep in mind that to be visible to all these functions, a property must be in the primary constructor. If it is defined within the class but not in the constructor, it will not be accessible.
+
 ```kotlin
-data class Product(val style: Int, val color: Int, val size: Int)
+data class Product(val style: Int, val color: Int, val size: Int) {
+  var vendor = "doesnt matter, wont be in the string"
+}
 
 fun main(args: Array<String>) {
     var whiteShirt = Product(1, 1, 2)
@@ -1037,6 +1041,13 @@ An example of `filter`, which is avaiable on Kotlin collections. Note the lambda
   val smallInts = ints.filter{ it < 4 }
 ```
 
+Works on maps too, since a map is a collection. Note that if you want to define the lambda separately, this typeless destructuring won't work because it won't be able to infer the types. And destructuring may need some extra work.
+
+```kotlin
+    val people = mutableMapOf("Jeff" to 34, "Dana" to 29)
+    val olderThan30 = people.filter{ (key, value) -> key == "Jeff" }
+```
+
 And here's `map`:
 
 ```kotlin
@@ -1059,3 +1070,590 @@ Note that with `map` we can return a new type:
   val people = listOf(Person("Jeff"), Person("Dana"))
   val names = people.map{ it -> it.name }
 ```
+
+## 8.3 - Introducing Predicates
+
+Predicates are lambdas that return Booleans. These are provided on collection classes: `any`, `all`, `count`, `find`
+
+
+## 8.4 - Using Predicates
+
+Here's `all` and `any`, which reduces a collection to a boolean. `count` returns the number of items that match a predicate (just like `filter` but returning only the length of the resulting collection).
+
+```kotlin
+fun main(args: Array<String>) {
+    val pagesRendered = listOf(true, true, false, true)
+    // note not "it == true", like JS it can be simplified
+    val allPagesRendered = pagesRendered.all{ it }
+    val anyPagesRendered = pagesRendered.any{ it }
+    val countPagesRendered = pagesRendered.count{ it }
+    println(allPagesRendered) // false
+    println(anyPagesRendered) // true
+    println(countPagesRendered) // 3
+}
+```
+
+We can assign predicates to variables, though if we do that we can't supply the lambda externally in curly brackets.
+
+```kotlin
+fun main(args: Array<String>) {
+    val applicationDecisions = listOf("D", "P", "P", "A")
+    val isPending = { decision: String -> decision == "P"}
+
+    // Note that we're passing this predicate as a normal argument, can't use the curly brace syntax here:
+    var pendingDecisions = applicationDecisions.filter(isPending)
+    println(pendingDecisions.toString())
+}
+```
+
+`find` returns the first element that matches the predicate:
+
+```kotlin
+fun main(args: Array<String>) {
+    val people = listOf(
+        mutableMapOf("first" to "Jeff", "last" to "Gore"),
+        mutableMapOf("first" to "Jeff", "last" to "Sessions")
+    )
+    // i.e. [{ first: "Jeff", last: "Gore" }, { first: "Jeff", last: "Sessions" }]
+
+    // will return null if nothing found
+    var firstPersonNamedJeff = people.find { person -> person["first"] == "Jeff" }
+    println(firstPersonNamedJeff.toString()) // {first=Jeff, last=Gore}
+}
+```
+
+Side notes: The above did NOT work when used dot notation like so:
+
+```kotlin
+// Error: Function invocation 'first(...)' expected
+{ person -> person.first == "Jeff" }
+```
+It might be because the maps in the above example are not of a specific type and declared inline. Because if `Person` were a type, this would work.
+
+
+## 8.5 - Using FlatMap in Kotlin
+
+Some cool stuff you can do:
+
+```kotlin
+val meetings = listOf(Meeting("lunch"), Meeting("dinner"))
+
+// This works:
+val titles = meetings.map{ it.title }
+
+// So does this:
+val titles = meetings.map(Meeting::title)
+```
+
+There is also a `flatten` and `flatMap` method to flatten collections and map over nested collections to return a flattened one, respectively.
+
+There's also a `distinct` method to filter out duplicates, but remember, if your collection members are objects, then they need to be a member of a `data` class.
+
+
+## 9.1 - Working with Infinite Collections Intro
+
+`filter` and `map` aren't good if your lists are huge, because they "eagerly" create auxillary data structures.
+
+Enter *sequences*. They are evaluated lazily, i.e. only when we ask it to.
+
+## 9.2 Using sequences
+
+Let's look at the difference betwen this:
+
+```kotlin
+val numbers = listOf(1, 2)
+
+val output = numbers.filter{
+    println("Filtering $it")
+    it < 10
+}.map{
+    println("Mapping $it to ${it * 10}")
+    it * 10
+}
+
+/*
+Output:
+Filtering 1
+Filtering 2
+Mapping 1 to 10
+Mapping 2 to 20
+*/
+```
+
+...and this:
+
+
+Let's look at the difference betwen this:
+
+```kotlin
+val numbers = listOf(1, 2)
+
+val output = numbers.asSequence().filter{
+    println("Filtering $it")
+    it < 10
+}.map{
+    println("Mapping $it to ${it * 10}")
+    it * 10
+}
+
+/*
+Output:
+(none)
+*/
+```
+What is going on here? "When the processing of an Iterable includes multiple steps, they are executed eagerly: each processing step completes and returns its result – an intermediate collection."
+
+But a sequence is different. As soon as we declare `.asSequence()`, then the `filter` and `map` methods are now operating on and returning a `Sequence`, not an `Iterable`. And that means that although the sequence is ready to do work, it won't actually compute the value until you ask it to, in a "terminal operation."
+
+A `Sequence` value can only be retrieved with a "terminal operation". "If a sequence operation returns another sequence, which is produced lazily, it's called intermediate. Otherwise, the operation is terminal. Examples of terminal operations are toList() or sum()."
+
+So, in the above example, let's add a terminal operation:
+
+```kotlin
+fun main(args: Array<String>) {
+    val numbers = listOf(1, 2)
+
+    val output = numbers.asSequence().filter{
+        println("Filtering $it")
+        it < 10
+    }.map{
+        println("Mapping $it to ${it * 10}")
+        it * 10
+    }
+
+    println(output.toList().toString())
+}
+
+/*
+Output:
+Filtering 1
+Mapping 1 to 10
+Filtering 2
+Mapping 2 to 20
+[10, 20]
+*/
+```
+Also note another key difference - "`Sequence` performs all the processing steps one-by-one for every single element. In turn, `Iterable` completes each step for the whole collection and then proceeds to the next step."
+
+## 9.3 Terminal operations on sequences
+
+So an obviously good choice for a Sequence is if you want to execute a `find` on an array but have to `map` it first. If you do it normally, you would have to transform the entire array via `map` before getting to `find`, which is a terminal operation.
+
+This is apparently identical to the Java 8+ `Stream`, but Kotlin created a new class for this so that it can be available everywhere; evidently the Java streams are not available on Android.
+
+## 10.1 Working with Java Functional Interfaces from Kotlin
+
+In Java, "events" are usually methods that accept something of type Interface, where you call methods on the passed-in Interface.
+
+A *functional interface* i.e. SAM (single abstract method) interface can accept a lambda in Java 8+.
+
+
+## 10.2 Passing Kotlin Functions to Java Methods
+
+Didn't really understand this, but the idea is that you can import a Java class with a method with a SAM interface and in Kotlin you can call it with a lambda.
+
+Here's a webpage with an example:
+```java
+public interface Adder {
+    public void add(int a, int b);
+}
+```
+
+```kotlin
+val adder = Adder { a, b -> a + b }
+```
+This works because `Adder` only has one abstract method - that is, only one method without an implementation. (It also just has one method total, but that's beside the point).
+
+Therefore when Kotlin or Java (this works in Java 8+, btw) passes a lambda to the constructor, it's undeniable what that lambda is for - supplying the implementation for that abstract method.
+
+## 10.3 The Use of 'SAM Constructors' from Kotlin
+
+What happens when the compiler cannot explicitly convert a lambda to a [Java] functional interface?
+
+You would have to simply use the SAM interface as a constructor, then pass that to whatever is requiring it.
+
+
+## 11.1 - Using Kotlin's Nullability Constraints to Improve Code
+
+Here's an example of a Java function that shows the problem with Java and nulls:
+
+```java
+boolean closeMeeting(Meeting meeting) {
+  if (meeting.canClose) return meeting.close();
+  return false;
+}
+```
+If meeting is `null`, you get a `NullPointerException`. But in Kotlin, the same function (as far as syntax) is safe, and will not even compile if you tried to pass null into it.
+
+```kotlin
+// This is functionally different, doesn't accept nulls. But is the most strict/faithful conversion of the Java
+fun closeMeeting(meeting: Meeting) : Boolean {
+  return if (meeting.canClose) meeting.close() else false
+}
+```
+
+We've already covered how `?` in Kotlin means nullable, not optional. So let's say an object is nullable. If you want to call a method on that object, you must tack on `?` to the nullable object.
+
+```kotlin
+val meeting: Meeting? = null
+meeting?.close()
+```
+
+Interesting example:
+```kotlin
+val nullableMeeting : Meeting? = null
+var nonNullMeeting : Meeting = Meeting()
+
+// This would fail because `Meeting` and `Meeting?` are not the same types.
+nonNullMeeting = nullableMeeting
+```
+
+## 11.2 Null checking in Kotlin
+
+### Safe Call
+
+```kotlin
+// If m is null, method is not called.
+m?.method()
+```
+### Elvis Operator
+
+OK, something new - the Elvis operator. `?:` aka the null-coalescing operator. This is similar to the logical OR in JS `||`:
+
+```kotlin
+// If existing meeting is not null, use that, otherwise create a new meeting.
+val newMeeting = existingMeeting ?: Meeting()
+```
+
+### Safe Cast
+
+"To avoid an exception being thrown, one can use a safe cast operator `as?` that returns null on failure":
+
+```kotlin
+// If `y` is not a String, `x` will be assigned to null. Note that `x` must be nullable for this to work.
+val x: String? = y as? String
+```
+
+### Not-Null assertions
+
+```kotlin
+// This will assert that `meeting` is not null and throw an error from that line if it is.
+meeting!!.sendInvites()
+```
+
+## 11.3 How to use null checking in Kotlin
+
+Here's how we'd write functionally equivalent code to that earlier Java example that accepted nulls.
+
+```kotlin
+fun closeMeeting(meeting: Meeting?) : Boolean {
+  return if (meeting?.canClose === true) meeting?.close() else false
+}
+```
+
+Remember there's no "truthiness" here. `meeting?.canClose` can return *three* different values: `true`, `false`, or `null`. So we have to explicitly check for `true` in the `if ` statement.
+
+
+## 11.4 Using the 'let' construct
+
+Let's say you are using a function provided by some external code that you don't own that does not accept null values, but you want to conditionally call it only if a value is not null.
+
+Enter the `let` function, part of the Kotlin standard library. This is available on the "prototype" of all instances and passes the instance itself as the sole argument:
+
+```kotlin
+// Either of these work, because it accepts a single parameter.
+    nullableMeeting?.let(::passMeetingToExternalService)
+    nullableMeeting?.let{ passMeetingToExternalService(it)}
+```
+
+
+## 11.5 Late initialized properties
+
+Don't be tempted to make a variable nullable just because you don't want to give a value yet. We can use `lateinit` to tell the Kotlin compiler that we promise to initalize the variable later.
+
+```kotlin
+lateinit var address: Address
+```
+
+This is useful in testing, per the documentation:
+
+```kotlin
+public class MyTest {
+    lateinit var subject: TestSubject
+
+    @SetUp fun setup() {
+        subject = TestSubject()
+    }
+
+    @Test fun test() {
+        subject.method()  // dereference directly
+    }
+}
+```
+
+
+## 12.1 Understand How Nullability Interacts with Your Existing Java Code
+
+Kotlin understands annotations from the Java world in these packages: `javax.annotation`, `android.support.annotation`, `org.jetbrains.annotation`. Among these annotations is `@Nullable` and `@NotNull` from jetbrains.
+
+
+## 12.2 Understanding the annotations you can make in Java to make your code null-aware
+
+Here's Java doing Kotlin a favor:
+
+```java
+public @Nullable String meetingTitle() {
+  return title;
+}
+```
+That would let the Kotlin compiler know that the return value of this function is `String?`.
+
+Another favor from java:
+```java
+public String addTitle(@NotNull String title) {
+  this.title = title;
+  return title;
+}
+```
+
+## 12.3 Using annotations in Java code
+
+But what if there are annotations in the Java code that your Kotlin code is using? In that case you have to handle the null checks in Kotlin yourself.
+
+Let's say you see this error message: "Type mismatch: inferred type is String! but Int was expected."
+
+Note the exclamation point: "String!". That means String is a "platform type", i.e. coming from a platform that's not Kotlin. "Any reference in Java may be null, which makes Kotlin's requirements of strict null-safety impractical for objects coming from Java. Types of Java declarations are treated specially in Kotlin and called platform types."
+
+"String!" essentially means "String? or String"
+
+You can't define these yourself; it's just for your knowledge when you get an error message from the compiler.
+
+
+## 12.4 Understanding issues with nullability when overriding Java methods
+
+Just shows that when implementing a Java interface you can choose to make your Kotlin implementation pick up the Slack where Java failed in terms of nullability:
+
+```java
+public interface Address {
+  // Note the return type of String in Java means "String or null"
+  public String getFirstAddress()
+}
+
+```kotlin
+class HomeAddress : Address {
+  // now this method is locked into always returning a String
+  override fun getFirstAddress(): String {
+    return ""
+  }
+}
+```
+
+## 13.1 Kotlin Collection Classes - Intro
+
+- Collections themselves can be nullable
+- Collections can hold null values
+- Collections can be read-only or mutable
+
+
+## 13.2 Creating collections in Kotlin
+
+`listOf`, `setOf`, `mapOf`
+`arrayListOf`, `hashSetOf`, `hashMapOf`
+`mutableListOf`
+
+
+Let's define a list of people.
+
+```kotlin
+// An explicitly typed list
+val people: listOf<Person?>(Person("Jeff"), null)
+
+// An implicitly typed list, will have the same type as above
+val people: listOf(Person("Jeff"), null)
+
+val nullableListOfNullablePeople = List<Person?>? = null
+```
+
+`add` is like `push` for lists.
+
+But `listOf`, by default, returns a read-only list. Just like all the other methods we mentioned. So you want `mutableListOf` for that, with the matching `MutableList` type. In other words, the collections are immutable unless you use the `mutable` types.
+
+And when we say immutable, we mean it. No adding to lists, no adding or removing key-value pairs. This is not the same thing as `val` vs `var`.
+
+OK, so let's say we're dealing with a `List<Person?>` and we want to iterate through it.
+
+```kotlin
+// This works, but prints `null` if the person is null
+for (person: Person? in people) {
+  println(person?.age)
+}
+
+// This is better
+```kotlin
+for (person: Person in people.filterNotNull()) {
+  println(person?.age)
+}
+```
+Note the built in Kotlin collection method `filterNotNull`.
+
+
+## 13.3 How Java Inter-operates with Kotlin collections
+
+Essentially Kotlin and Java collections are the same. `Map`, `List`, and `Set` are the same.
+
+But Java does not distinguish between mutable and immutable collections. There's no compile-time check in Java to see if a collection is immutable (you can make a runtime check, though).
+
+
+## 13.4 Using arrays in Kotlin
+
+You can use `arrayOf`, `arrayOfNulls`, or the `Array()` constructor to create arrays of references (objects).
+
+Each primitive type has its own array type: `IntArray`, `ByteArray`, `CharArray`, etc.
+
+The presenter suggests that arrays are not collections but Kotlin offers the same methods for both.
+
+```kotlin
+fun main(args: Array<String>) {
+    // note "indices"!
+    for (i in args.indices) {
+
+    }
+}
+```
+
+And assigning to an array index is the same as JS:
+
+```kotlin
+val items = IntArray(2)
+items[0] = 1
+items[1] = 2
+
+// or we could have just done:
+val numbers = intArrayOf(1, 2, 3, 4, 5)
+
+// [JGQ: Why not just use arrayOf?]
+```
+
+`forEach` exists; also, check out the `forEachIndexed` method:
+
+```kotlin
+numbers.forEachIndexed{ index, element ->
+  println("$index is: $element")
+}
+```
+
+
+## 14.1 - Using Higher Order Functions - Intro
+
+(nothing new)
+
+## 14.2 - Declaring and Using Higher Order Functions
+
+```kotlin
+val calc = {x: Int, y: Int -> x * y}
+// or
+val calc : (Int, Int) -> Int = {x, y -> x * y}
+
+```
+
+## 14.3 - Inlining functions
+
+- Lambdas map to anonymous classes in the bytecode
+- Extra class and method created each time, this can be expensive*
+
+If you use the `inline` keyword in a function, then in the bytecode the innards of the function will be simply spread into the calling function.
+
+*Use when your function takes another function as an argument. Otherwise you'll get this: "Expected performance impact from inlining is insignificant. Inlining works best for functions with parameters of functional types"
+
+i.e.
+```kotlin
+inline fun doSomething(func) {
+  func()
+}
+
+fun main(args: Array<String>) {
+  doSomething()
+}
+```
+```java
+/// in the bytecode, vastly simplified:
+public static final void main(String[] args) {
+  func()
+}
+```
+
+"In order to reduce the memory overhead of such higher order functions or lambda expression we can use the `inline` keyword which ultimately requests the compiler to not allocate memory and simply copy the inlined code of that function at the calling place."
+
+If we want to store a lambda in a variable, then we can't inline it. Because then the variable wouldn't have anything to reference. And syntactically, there's nowhere to put the word `inline`.
+
+Internally, Kotlin inlines all of its collection operations, such as `map`, `filter`, etc. But on a `Sequence`, those operations are not inlined, since those functions are not immediately executed.
+
+
+
+
+
+
+
+
+## 15.1 Generics - Introduction
+
+This is valid:
+
+```kotlin
+// of what? Doesn't matter! It can be empty because once we're ready to `add` to this list, we know what type it's going to be.
+val meetings:List<Meeting> = mutableListOf()
+```
+
+If you want your class to take a generic type, meaning a variable type, you could use the angle bracket syntax `<T>`. `T` can be anything, but seems like a convention to use `T` as a variable name for a generic type.
+
+First, a class example. This is a `Node` class that can hold any type of `data`, but once that type is established, then all of its children must be of the same type. For instance:
+
+```kotlin
+data class Node<T> (val data: T) {
+    var children = mutableListOf<Node<T>>()
+
+    fun addChild(data: T): Node<T> {
+        children.add(Node(data))
+        return this
+    }
+}
+```
+
+Next, a function example. Functions behave differently in that the type parameters must *precede* the name of the function:
+
+```kotlin
+fun <T> lengthOf (iterable: T) : Int {
+    if (iterable is List<*>) {
+        return iterable.size
+    }
+    if (iterable is String) {
+        return iterable.length
+    }
+    return -1
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+Sidenote: you can't use truthiness or falsiness in an `if` condition.
+
+```kotlin
+// this is invalid
+if (meeting)
+```
+
+Not sure how TO TURN AN OBJECT INTO A BOOLEAN!
+
+Does truthy and falsy exist?
+
+Does undefined exist?
+
+Theres an `Any` type.
