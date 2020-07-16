@@ -1633,6 +1633,168 @@ fun <T> lengthOf (iterable: T) : Int {
 }
 ```
 
+## 15.3 Constraints on Generics
+
+Just because you create your function or class to accept a generic type doesn't mean it has to accept any type. You can constrain the types allowed, essentially making your type argument your own enum (rather than the enum being the entire list of types recognized by the compiler).
+
+Let's take a look at this example again. Let's say you wanted this Node to accept any type of number, be it an int or a float. Luckily we have the `Number` "superclass for all platform classes representing numeric values".
+
+So let's limit this generic type to be a number:
+
+```kotlin
+data class Node<T : Number> (val data: T) {
+    var children = mutableListOf<Node<T>>()
+
+    fun addChild(data: T): Node<T> {
+        children.add(Node(data))
+        return this
+    }
+}
+```
+Unfortunately, it doesn't look like you provide a list, i.e. `<T: Number, List<*>>`. The reason being, that comma is reserved for constraints corresponding to a second parameter. So this would certainly be possible: `<T, S: Number, List<*>>`, but means something different. `T` must be a `Number` of some kind, and `S` can be a list of anything.
+
+## 15.4 Reifying Generic type information
+
+There are issues with generics. Java erases all generic type information at runtime.
+
+> Sadly, Kotlin has inherited Java's limitation on generics: they are strictly a compile-time concept - the generic type information is erased at runtime. Therefore, you can not say T() to construct a new instance of a generic type; you can not at runtime check if an object is an instance of a generic type parameter; and if you try to cast between generic types, the compiler can't guarantee the correctness of it.
+
+Example:
+```kotlin
+fun printType(items: List<Any>) {
+  // ERROR: Cannot check for instance of erased type: List<string>
+  if (items is List<String>) {
+    println("We have strings")
+  }
+}
+```
+
+Enter "reification" - to "reify" means to make something real. We want to reify the generic type into something the compiler can use.
+
+Kotlin offers the ability to reify generic types on inline functions only.
+
+Here's how you'd start off that declaration:
+```kotlin
+inline fun <reified T> fun sayHi(var arg: T)
+```
+
+## 15.5 Using Reified Generics
+
+Here's an example. We want to use the construction `item is T` - "is this object `item` of variable type `T`" - which we can't do without reification.
+
+```kotlin
+// This new method will be added to any type of list: `List<*>`. Remember `List<Any>` and `List<Any?>` are different. This case covers them both.
+inline fun <reified T> List<*>.getElementsByType(): List<T> {
+    val elementsOfType = mutableListOf<T>()
+
+    for (item in this) {
+        if (item is T) {
+            elementsOfType.add(item)
+        }
+    }
+    return elementsOfType
+}
+
+fun main(args: Array<String>) {
+    var list = listOf("hi", 3, null, "hello")
+    var stringsInList = list.getElementsByType<String>()
+    println(stringsInList.toString()) // output: [hi, hello]
+}
+```
+
+## 15.6 Modifying Reification with 'noinline'
+
+You can use `::class` to get metadata properties on a class.
+
+If you make a function `inline`, then if it takes a function as an argument, that by default is `inline`; but you can mark it as `noinline`.
+
+You can pass an entire class definition into a function if you want:
+
+```kotlin
+// Assuming `Meeting` is a supertype from which more specific types of meeting classes inherit.
+fun <T: Meeting> buildMeeting(meetingClass: Class<T>) {
+  val meeting : T = meetingClass.newInstance()
+}
+
+// Or instead of passing the class as an argument, just get to it via the metadata:
+fun <T: Meeting> buildMeeting(meetingClass: Class<T>) {
+  val meeting : T = T::class.java.newInstance()
+}
+```
+
+## 15.7 Generic Variance in Kotlin
+
+This is not safe:
+
+```kotlin
+// Assuming FinanceMeeting derives from Meeting
+var meetings: MutableList<FinanceMeeting> = mutableListOf()
+
+// Not allowed: FinanceMeeting may have more specific properties/methods than a generic Meeting, and this list is for FinanceMeetings only.
+meetings.add(Meeting())
+```
+An interesting acronym from the Java world: PECS.
+
+For Producers, we use the Extends keyword.
+For Consumers, we use the Super keyword.
+
+ALL SIDE NOTES:
+
+"PECS" is from the collection's point of view. If you are only pulling items from a generic collection, it is a producer and you should use extends; if you are only stuffing items in, it is a consumer and you should use super. If you do both with the same collection, you shouldn't use either extends or super.
+
+A producer is allowed to produce something more specific, hence extends; a consumer is allowed to accept something more general, hence super.
+
+Invariance/non-variance: `MyClass`
+Covariance: `? extends MyClass`,
+Contravariance: `? super MyClass` and
+
+END SIDE NOTES:
+
+Invariant: We can't pass a subtype to something that's expecting a type.
+Covariant (`out`): A derived type can be used if the base type is more specific
+Contravariant (`in`): A base type can be used if the derived type is more specific
+
+Example
+```kotlin
+class MeetingGroup<out T: Meeting> (val meetings: List<Meeting>)
+```
+
+GOOD STACK OVERFLOW EXPLANATION:
+https://stackoverflow.com/questions/55677861/what-does-in-out-actually-do-in-kotlin-when-passed-as-arguments/55680445#55680445
+
+Let me demonstrate what in/out do with the help of an example. Consider the following:
+
+```kotlin
+private fun foo(list: ArrayList<Number>) {}
+private fun bar(list: ArrayList<Number>) {}
+```
+
+Now we try to pass an ArrayList to each function, each with a different generic type parameter:
+
+```kotlin
+// Error: Type Mismatch. Required `ArrayList<Number>` Found `ArrayList<Int>`
+foo(arrayListOf<Int>())
+
+// Error: Type Mismatch. Required `ArrayList<Number>` Found `ArrayList<Any>`
+bar(arrayListOf<Any>())
+```
+
+But we get errors! How do we solve that? We have to tell the compiler somehow that, for foo the list can also contain elements of a subtype of Number (e.g. Int) and for bar we have to tell the compiler that the list can also contain elements of a basetype of Number (e.g. Any).
+
+```kotlin
+// WITH JG EDITS
+// The Number is a "producer" of other types. We can use types that come OUT of number
+private fun allowNumberAndSubtypes(list: ArrayList<out Number>) {
+  // `Int`, `Float`, `Double`, etc.
+}
+
+// The Number is a "consumer" of a higher type. Number is IN a larger type
+private fun allowAnyInWhichNumberIsASubtype(list: ArrayList<in Number>) {
+  // `Any`
+}
+```
+
+And now it works!
 
 
 
@@ -1642,6 +1804,12 @@ fun <T> lengthOf (iterable: T) : Int {
 
 
 
+
+
+
+
+
+`Any` is a generic type?
 
 Sidenote: you can't use truthiness or falsiness in an `if` condition.
 
@@ -1657,3 +1825,5 @@ Does truthy and falsy exist?
 Does undefined exist?
 
 Theres an `Any` type.
+
+Look up difference between Declaration-site and use-site/call-site variance
