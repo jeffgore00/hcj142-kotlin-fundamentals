@@ -2,10 +2,10 @@
 
 Kotlin is a language used to write applications to be run on the Java Virtual Machine (JVM); it is regarded as a "better Java than Java".
 
-> JVM docs: https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-1.html#jvms-1.
-
+JVM docs: https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-1.html#jvms-1.
+>
 > The Java Virtual Machine is the cornerstone of the Java platform. It is the component of the technology responsible for its hardware- and operating system-independence, the small size of its compiled code, and its ability to protect users from malicious programs.
-
+>
 > The Java Virtual Machine is an abstract computing machine. Like a real computing machine, it has an instruction set and manipulates various memory areas at run time...The Java Virtual Machine knows nothing of the Java programming language, only of a particular binary format, the class file format. A class file contains Java Virtual Machine instructions (or bytecodes)
 
 ## 2.1 Course introduction
@@ -70,16 +70,16 @@ java -jar HelloWorld.jar
 Here's the answer.
 
 > When you write an application in Java, you get to rely on all of the standard class libraries. The java. classes (e.g. java.lang.*, java.util.* ...) are included with every JRE, so you don't need to package them yourself.
-
+>
 > Kotlin includes its own standard class library (the Kotlin runtime), separate to the Java class library. To distribute a jar file that can be run by anyone with a plain old JRE, you need to bundle the Kotlin runtime as well.
 
-# 2.3 What is Kotlin
+## 2.3 What is Kotlin
 
 - It's a JVM language, meaning it compiles to Java bytecode.
 - It's object oriented
 - It's also functional, supports higher order functions. Functions are first-class citizens.
 
-# 2.4 Basic Coding in Kotlin
+## 2.4 Basic Coding in Kotlin
 
 `var` is for reassignable variables; `val` is for immutable ones.
 
@@ -121,7 +121,7 @@ In Java you would have had to declare both the class and its method `displayName
 
 Note the demonstration of Kotlin's ability to accept functions as an argument with its function `callExternalFuncWithName`.
 
-Also note that Kotlin supports the "${variable}" syntax, but the IDE recommends the more concise "$variable" syntax IF the variable is not a property accessor. But if you want to interpolate `obj.value` (a "compound variable"), then you must use "${obj.value}"
+Also note that Kotlin supports the `"${variable}"` syntax, but the IDE recommends the more concise `"$variable"` syntax IF the variable is not a property accessor. But if you want to interpolate `obj.value` (a "compound variable"), then you must use `"${obj.value}"`
 
 Note the way you have to reference functions outside of their definition - with `::`. Evidently this is similar to Java.
 
@@ -179,7 +179,7 @@ He mentions a "JavaBean". What's that?
 
 https://stackoverflow.com/questions/3295496/what-is-a-javabean-exactly
 > A JavaBean is just a standard:
-
+>
 > - All properties private (use getters/setters)
 > - A public no-argument constructor
 > - Implements Serializable.
@@ -218,11 +218,11 @@ public final class Person {
 ```
 Note the most important thing here - when you declare a variable within a Kotlin class, or in the constructor, the compiler will convert it to a private variable with a public-facing getter and setter.
 
-# 3.4 String Templates in Kotlin
+## 3.4 String Templates in Kotlin
 
 (covered earlier)
 
-# 3.5 Using 'if' as an expression
+## 3.5 Using 'if' as an expression
 
 This code works:
 ```kotlin
@@ -240,9 +240,9 @@ In Kotlin `if` is an *expression*. So you can do this:
 
 ```kotlin
 val message = if (q.answer == q.correct) {
-  println("You're right")
+  "You're right"
 } else {
-  println("You're wrong")
+  "You're wrong"
 }
 ```
 
@@ -270,7 +270,7 @@ class Person(var name: String) {
 There is no `switch` statement in Kotlin. But there is `when`:
 
 ```kotlin
-fun choose(flavor:String?) {
+fun choose(flavor : String?) {
   when (flavor) {
     "lemon" -> println("Nice, sour is good")
     "pig kidney" -> println("Gross, man!")
@@ -1457,10 +1457,9 @@ class HomeAddress : Address {
 
 ## 13.2 Creating collections in Kotlin
 
-`listOf`, `setOf`, `mapOf`
-`arrayListOf`, `hashSetOf`, `hashMapOf`
-`mutableListOf`
-
+- `listOf`, `setOf`, `mapOf`
+- `arrayListOf`, `hashSetOf`, `hashMapOf`
+- `mutableListOf`
 
 Let's define a list of people.
 
@@ -1516,7 +1515,7 @@ The presenter suggests that arrays are not collections but Kotlin offers the sam
 fun main(args: Array<String>) {
     // note "indices"!
     for (i in args.indices) {
-
+      // do stuff
     }
 }
 ```
@@ -1587,12 +1586,6 @@ public static final void main(String[] args) {
 If we want to store a lambda in a variable, then we can't inline it. Because then the variable wouldn't have anything to reference. And syntactically, there's nowhere to put the word `inline`.
 
 Internally, Kotlin inlines all of its collection operations, such as `map`, `filter`, etc. But on a `Sequence`, those operations are not inlined, since those functions are not immediately executed.
-
-
-
-
-
-
 
 
 ## 15.1 Generics - Introduction
@@ -1735,20 +1728,16 @@ meetings.add(Meeting())
 ```
 An interesting acronym from the Java world: PECS.
 
-For Producers, we use the Extends keyword.
-For Consumers, we use the Super keyword.
+> For Producers, we use the Extends keyword.
+> For Consumers, we use the Super keyword.
 
-ALL SIDE NOTES:
+> "PECS" is from the collection's point of view. If you are only pulling items from a generic collection, it is a producer and you should use extends; if you are only stuffing items in, it is a consumer and you should use super. If you do both with the same collection, you shouldn't use either extends or super.
 
-"PECS" is from the collection's point of view. If you are only pulling items from a generic collection, it is a producer and you should use extends; if you are only stuffing items in, it is a consumer and you should use super. If you do both with the same collection, you shouldn't use either extends or super.
+> A producer is allowed to produce something more specific, hence extends; a consumer is allowed to accept something more general, hence super.
 
-A producer is allowed to produce something more specific, hence extends; a consumer is allowed to accept something more general, hence super.
-
-Invariance/non-variance: `MyClass`
-Covariance: `? extends MyClass`,
-Contravariance: `? super MyClass` and
-
-END SIDE NOTES:
+> Invariance/non-variance: `MyClass`
+> Covariance: `? extends MyClass`,
+> Contravariance: `? super MyClass` and
 
 Invariant: We can't pass a subtype to something that's expecting a type.
 Covariant (`out`): A derived type can be used if the base type is more specific
@@ -1759,40 +1748,40 @@ Example
 class MeetingGroup<out T: Meeting> (val meetings: List<Meeting>)
 ```
 
-GOOD STACK OVERFLOW EXPLANATION:
+Still confused? Check this answer with my modifications to the end example:
 https://stackoverflow.com/questions/55677861/what-does-in-out-actually-do-in-kotlin-when-passed-as-arguments/55680445#55680445
 
-Let me demonstrate what in/out do with the help of an example. Consider the following:
-
-```kotlin
-private fun foo(list: ArrayList<Number>) {}
-private fun bar(list: ArrayList<Number>) {}
-```
-
-Now we try to pass an ArrayList to each function, each with a different generic type parameter:
-
-```kotlin
-// Error: Type Mismatch. Required `ArrayList<Number>` Found `ArrayList<Int>`
-foo(arrayListOf<Int>())
-
-// Error: Type Mismatch. Required `ArrayList<Number>` Found `ArrayList<Any>`
-bar(arrayListOf<Any>())
-```
-
-But we get errors! How do we solve that? We have to tell the compiler somehow that, for foo the list can also contain elements of a subtype of Number (e.g. Int) and for bar we have to tell the compiler that the list can also contain elements of a basetype of Number (e.g. Any).
-
-```kotlin
-// WITH JG EDITS
-// The Number is a "producer" of other types. We can use types that come OUT of number
-private fun allowNumberAndSubtypes(list: ArrayList<out Number>) {
-  // `Int`, `Float`, `Double`, etc.
-}
-
-// The Number is a "consumer" of a higher type. Number is IN a larger type
-private fun allowAnyInWhichNumberIsASubtype(list: ArrayList<in Number>) {
-  // `Any`
-}
-```
+> Let me demonstrate what `in`/`out` do with the help of an example. Consider the following:
+>
+> ```kotlin
+> private fun foo(list: ArrayList<Number>) {}
+> private fun bar(list: ArrayList<Number>) {}
+> ```
+>
+> Now we try to pass an `ArrayList` to each function, each with a different generic type parameter:
+>
+> ```kotlin
+> // Error: Type Mismatch. Required `ArrayList<Number>` Found `ArrayList<Int>`
+> foo(arrayListOf<Int>())
+>
+> // Error: Type Mismatch. Required `ArrayList<Number>` Found `ArrayList<Any>`
+> bar(arrayListOf<Any>())
+> ```
+>
+> But we get errors! How do we solve that? We have to tell the compiler somehow that, for foo the list can also contain elements of a subtype of Number (e.g. Int) and for bar we have to tell the compiler that the list can also contain elements of a basetype of Number (e.g. Any).
+>
+>```kotlin
+>// WITH JG EDITS
+>// The Number is a "producer" of other types. We can use types that come OUT of number
+>private fun allowNumberAndSubtypes(list: ArrayList<out Number>) {
+>  // `Int`, `Float`, `Double`, etc.
+>}
+>
+>// The Number is a "consumer" of a higher type. Number is IN a larger type
+>private fun allowAnyInWhichNumberIsASubtype(list: ArrayList<in Number>) {
+>  // `Any`
+>}
+>```
 
 And now it works!
 
@@ -1809,21 +1798,3 @@ And now it works!
 
 
 
-`Any` is a generic type?
-
-Sidenote: you can't use truthiness or falsiness in an `if` condition.
-
-```kotlin
-// this is invalid
-if (meeting)
-```
-
-Not sure how TO TURN AN OBJECT INTO A BOOLEAN!
-
-Does truthy and falsy exist?
-
-Does undefined exist?
-
-Theres an `Any` type.
-
-Look up difference between Declaration-site and use-site/call-site variance
