@@ -1786,15 +1786,14 @@ https://stackoverflow.com/questions/55677861/what-does-in-out-actually-do-in-kot
 And now it works!
 
 
+## Extra Notes:
+
+Re lists vs. arrays, from the documentation: "As you see, in some aspects lists are very similar to arrays. However, there is one important difference: an array's size is defined upon initialization and is never changed; in turn, a list doesn't have a predefined size; a list's size can be changed as a result of write operations: adding, updating, or removing elements.
+
+In Kotlin, the default implementation of List is ArrayList which you can think of as a resizable array."
+https://kotlinlang.org/docs/reference/collections-overview.html
 
 
-
-
-
-
-
-
-
-
-
+Re: truthy and false, from the docs: "There are no automatic conversions to boolean and thus no concept of truthy and falsy: checks for zero, empty, or null must be done explicitly with == or !=. Most collection types have an isEmpty() and an isNotEmpty() function."
+https://kotlinlang.org/docs/tutorials/kotlin-for-py/conditionals.html
 
