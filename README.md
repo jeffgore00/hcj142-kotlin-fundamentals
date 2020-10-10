@@ -1,3 +1,100 @@
+Course URL: https://app.pluralsight.com/library/courses/kotlin-fundamentals
+
+- [1. Course Overview](#1-course-overview)
+  - [1.1 Overview](#11-overview)
+- [2. Introduction](#2-introduction)
+  - [2.1 Course introduction](#21-course-introduction)
+  - [2.2 Installing Kotlin](#22-installing-kotlin)
+  - [2.3 What is Kotlin](#23-what-is-kotlin)
+  - [2.4 Basic Coding in Kotlin](#24-basic-coding-in-kotlin)
+- [3. Getting Started with Kotlin](#3-getting-started-with-kotlin)
+  - [3.1 Getting started with Kotlin - intro](#31-getting-started-with-kotlin---intro)
+  - [3.2 Using Kotlin Without Creating Any Class Definitions](#32-using-kotlin-without-creating-any-class-definitions)
+  - [3.3 Kotlin's support for immutability](#33-kotlins-support-for-immutability)
+  - [3.4 String Templates in Kotlin](#34-string-templates-in-kotlin)
+  - [3.5 Using 'if' as an expression](#35-using-if-as-an-expression)
+  - [3.6 How Kotlin Improves the Handling of Null Values](#36-how-kotlin-improves-the-handling-of-null-values)
+  - [3.7 The 'When' Statement in Kotlin](#37-the-when-statement-in-kotlin)
+  - [3.8 Using 'try'](#38-using-try)
+  - [3.9 Kotlin's looping constructs](#39-kotlins-looping-constructs)
+  - [3.10 Kotlin's support for exceptions](#310-kotlins-support-for-exceptions)
+- [4. Functions In Kotlin](#4-functions-in-kotlin)
+  - [4.1 Functions In Kotlin - Introduction](#41-functions-in-kotlin---introduction)
+  - [4.2 Declaring functions](#42-declaring-functions)
+  - [4-3 Interoperability with Java](#4-3-interoperability-with-java)
+  - [4-4 Default Parameters](#4-4-default-parameters)
+  - [4-5 Named Parameters](#4-5-named-parameters)
+  - [4.6 Extension Functions](#46-extension-functions)
+  - [4.7 Infix functions](#47-infix-functions)
+  - [4.8 Tail Recursive Functions](#48-tail-recursive-functions)
+- [5 Programming with Types](#5-programming-with-types)
+  - [5.1 Programming with Types Introduction](#51-programming-with-types-introduction)
+  - [5.2 Interfaces](#52-interfaces)
+  - [5-3 Defining Classes in Kotlin](#5-3-defining-classes-in-kotlin)
+  - [5-4 Sealed classes](#5-4-sealed-classes)
+  - [5-5 Providing Constructors](#5-5-providing-constructors)
+  - [5-6 Data Classes](#5-6-data-classes)
+- [6. Companion Objects](#6-companion-objects)
+  - [6-1 Companion Objects Introduction](#6-1-companion-objects-introduction)
+  - [6-2 Using the `object` keyword](#6-2-using-the-object-keyword)
+  - [6-3 Extending objects](#6-3-extending-objects)
+  - [6-4 Companion objects](#6-4-companion-objects)
+  - [6-5 Using companion objects](#6-5-using-companion-objects)
+- [7 Using High Level Functions](#7-using-high-level-functions)
+  - [7-1 Using High Level Functions - Intro](#7-1-using-high-level-functions---intro)
+  - [7-2 Using Anonymous Classes to Implement Functionality](#7-2-using-anonymous-classes-to-implement-functionality)
+  - [7-3 Introducing Higher Order Functions](#7-3-introducing-higher-order-functions)
+  - [7-3 Using Higher Order Functions In Kotlin](#7-3-using-higher-order-functions-in-kotlin)
+  - [7-4 Closures](#7-4-closures)
+  - [7-5 With and Apply](#7-5-with-and-apply)
+- [8. Filtering and Sorting](#8-filtering-and-sorting)
+  - [8.1 - Filtering and Sorting Intro](#81---filtering-and-sorting-intro)
+  - [8.2 - Filter and Map in Kotlin](#82---filter-and-map-in-kotlin)
+  - [8.3 - Introducing Predicates](#83---introducing-predicates)
+  - [8.4 - Using Predicates](#84---using-predicates)
+  - [8.5 - Using FlatMap in Kotlin](#85---using-flatmap-in-kotlin)
+- [9. Working with Infinite Collections](#9-working-with-infinite-collections)
+  - [9.1 - Working with Infinite Collections Intro](#91---working-with-infinite-collections-intro)
+  - [9.2 Using sequences](#92-using-sequences)
+  - [9.3 Terminal operations on sequences](#93-terminal-operations-on-sequences)
+- [10. Working with Java Functional Interfaces from Kotlin](#10-working-with-java-functional-interfaces-from-kotlin)
+  - [10.1 Intro](#101-intro)
+  - [10.2 Passing Kotlin Functions to Java Methods](#102-passing-kotlin-functions-to-java-methods)
+  - [10.3 The Use of 'SAM Constructors' from Kotlin](#103-the-use-of-sam-constructors-from-kotlin)
+- [11. Using Kotlin's Nullability Constraints to Improve Code](#11-using-kotlins-nullability-constraints-to-improve-code)
+  - [11.1 - Intro](#111---intro)
+  - [11.2 Null checking in Kotlin](#112-null-checking-in-kotlin)
+    - [Safe Call](#safe-call)
+    - [Elvis Operator](#elvis-operator)
+    - [Safe Cast](#safe-cast)
+    - [Not-Null assertions](#not-null-assertions)
+  - [11.3 How to use null checking in Kotlin](#113-how-to-use-null-checking-in-kotlin)
+  - [11.4 Using the 'let' construct](#114-using-the-let-construct)
+  - [11.5 Late initialized properties](#115-late-initialized-properties)
+- [12. Understand How Nullability Interacts with Your Existing Java Code](#12-understand-how-nullability-interacts-with-your-existing-java-code)
+  - [12.1 Intro](#121-intro)
+  - [12.2 Understanding the annotations you can make in Java to make your code null-aware](#122-understanding-the-annotations-you-can-make-in-java-to-make-your-code-null-aware)
+  - [12.3 Using annotations in Java code](#123-using-annotations-in-java-code)
+  - [12.4 Understanding issues with nullability when overriding Java methods](#124-understanding-issues-with-nullability-when-overriding-java-methods)
+- [13. Kotlin Collection Classes](#13-kotlin-collection-classes)
+  - [13.1 Kotlin Collection Classes - Intro](#131-kotlin-collection-classes---intro)
+  - [13.2 Creating collections in Kotlin](#132-creating-collections-in-kotlin)
+  - [13.3 How Java Inter-operates with Kotlin collections](#133-how-java-inter-operates-with-kotlin-collections)
+  - [13.4 Using arrays in Kotlin](#134-using-arrays-in-kotlin)
+- [14. Using Higher Order Functions](#14-using-higher-order-functions)
+  - [14.1 - Using Higher Order Functions - Intro](#141---using-higher-order-functions---intro)
+  - [14.2 - Declaring and Using Higher Order Functions](#142---declaring-and-using-higher-order-functions)
+  - [14.3 - Inlining functions](#143---inlining-functions)
+- [15. Generics](#15-generics)
+  - [15.1 Generics - Introduction](#151-generics---introduction)
+  - [15.3 Constraints on Generics](#153-constraints-on-generics)
+  - [15.4 Reifying Generic type information](#154-reifying-generic-type-information)
+  - [15.5 Using Reified Generics](#155-using-reified-generics)
+  - [15.6 Modifying Reification with 'noinline'](#156-modifying-reification-with-noinline)
+  - [15.7 Generic Variance in Kotlin](#157-generic-variance-in-kotlin)
+
+# 1. Course Overview
+
 ## 1.1 Overview
 
 Kotlin is a language used to write applications to be run on the Java Virtual Machine (JVM); it is regarded as a "better Java than Java".
@@ -7,6 +104,8 @@ JVM docs: https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-1.html#jvms-1.
 > The Java Virtual Machine is the cornerstone of the Java platform. It is the component of the technology responsible for its hardware- and operating system-independence, the small size of its compiled code, and its ability to protect users from malicious programs.
 >
 > The Java Virtual Machine is an abstract computing machine. Like a real computing machine, it has an instruction set and manipulates various memory areas at run time...The Java Virtual Machine knows nothing of the Java programming language, only of a particular binary format, the class file format. A class file contains Java Virtual Machine instructions (or bytecodes)
+
+# 2. Introduction
 
 ## 2.1 Course introduction
 
@@ -128,6 +227,8 @@ Note the way you have to reference functions outside of their definition - with 
 Note also that we were able to declare variables without declaring their type. It's inferred from what's going on on the right hand side of that assignment.
 
 Note also there's no `new` keyword when utilizing the `Person` constructor.
+
+# 3. Getting Started with Kotlin
 
 ## 3.1 Getting started with Kotlin - intro
 
@@ -381,6 +482,7 @@ Like JS and JavaScript, it supports a `finally` after the end of try/catch.
 
 (Look more into how Kotlin can use Java libraries. For instance `FileReader`.)
 
+# 4. Functions In Kotlin
 
 ## 4.1 Functions In Kotlin - Introduction
 
@@ -613,6 +715,7 @@ tailrec fun fib(n: Int, a: BigInteger, b: BigInteger): BigInteger {
   return if (n == 0) b else fib(n - 1, a + b, a)
 }
 ```
+# 5 Programming with Types
 
 ## 5.1 Programming with Types Introduction
 (nothing)
@@ -812,6 +915,7 @@ fun main(args: Array<String>) {
     println(blackShirt == blackShirtCopy) // true
 }
 ```
+# 6. Companion Objects
 
 ## 6-1 Companion Objects Introduction
 
@@ -894,6 +998,7 @@ class Math() {
 ```
 Look also into how companion objects help with factories.
 
+# 7 Using High Level Functions
 
 ## 7-1 Using High Level Functions - Intro
 
@@ -1029,6 +1134,7 @@ fun main(args: Array<String>) {
     }.sendInvites()
 }
 ```
+# 8. Filtering and Sorting
 
 ## 8.1 - Filtering and Sorting Intro
 
@@ -1150,6 +1256,8 @@ There is also a `flatten` and `flatMap` method to flatten collections and map ov
 There's also a `distinct` method to filter out duplicates, but remember, if your collection members are objects, then they need to be a member of a `data` class.
 
 
+# 9. Working with Infinite Collections
+
 ## 9.1 - Working with Infinite Collections Intro
 
 `filter` and `map` aren't good if your lists are huge, because they "eagerly" create auxillary data structures.
@@ -1241,7 +1349,9 @@ So an obviously good choice for a Sequence is if you want to execute a `find` on
 
 This is apparently identical to the Java 8+ `Stream`, but Kotlin created a new class for this so that it can be available everywhere; evidently the Java streams are not available on Android.
 
-## 10.1 Working with Java Functional Interfaces from Kotlin
+# 10. Working with Java Functional Interfaces from Kotlin
+
+## 10.1 Intro
 
 In Java, "events" are usually methods that accept something of type Interface, where you call methods on the passed-in Interface.
 
@@ -1272,8 +1382,9 @@ What happens when the compiler cannot explicitly convert a lambda to a [Java] fu
 
 You would have to simply use the SAM interface as a constructor, then pass that to whatever is requiring it.
 
+# 11. Using Kotlin's Nullability Constraints to Improve Code
 
-## 11.1 - Using Kotlin's Nullability Constraints to Improve Code
+## 11.1 - Intro
 
 Here's an example of a Java function that shows the problem with Java and nulls:
 
@@ -1391,8 +1502,9 @@ public class MyTest {
 }
 ```
 
+# 12. Understand How Nullability Interacts with Your Existing Java Code
 
-## 12.1 Understand How Nullability Interacts with Your Existing Java Code
+## 12.1 Intro
 
 Kotlin understands annotations from the Java world in these packages: `javax.annotation`, `android.support.annotation`, `org.jetbrains.annotation`. Among these annotations is `@Nullable` and `@NotNull` from jetbrains.
 
@@ -1447,6 +1559,8 @@ class HomeAddress : Address {
   }
 }
 ```
+
+# 13. Kotlin Collection Classes
 
 ## 13.1 Kotlin Collection Classes - Intro
 
@@ -1541,6 +1655,7 @@ numbers.forEachIndexed{ index, element ->
 }
 ```
 
+# 14. Using Higher Order Functions 
 
 ## 14.1 - Using Higher Order Functions - Intro
 
@@ -1587,6 +1702,7 @@ If we want to store a lambda in a variable, then we can't inline it. Because the
 
 Internally, Kotlin inlines all of its collection operations, such as `map`, `filter`, etc. But on a `Sequence`, those operations are not inlined, since those functions are not immediately executed.
 
+# 15. Generics
 
 ## 15.1 Generics - Introduction
 
